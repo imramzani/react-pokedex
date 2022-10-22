@@ -16,24 +16,30 @@ function App() {
   const gotoPrev = () => {
     setCurrentPageURL(prevPageURL)
   }
-
   
-  useEffect(() => {
-    setLoading(true)
-    axios.get(currentPageURL)
+  useEffect( () => {
+    // setLoading(true)
+    async function fetchAPI (){
+      await axios.get(currentPageURL)
       .then(res => {
         console.log(res.data)
         setNextPageURL(res.data.next)
         setPrevPageURL(res.data.previous)
-        setList(res.data.results.map(el => el.name))
+        let newArr = []
+        res.data.results.forEach(async (el) => await axios.get(el.url).then(r => newArr.push(r)))
+        setList(newArr)
+        console.log(newArr)
+        console.log(list)
       })
       .catch(err => {
-        console.log(err.data)
+        console.log(err)
       })
-  
+    } 
+      fetchAPI()
+      console.log(currentPageURL)
   }, [currentPageURL])
 
-  if(loading) return "loading"
+  if(loading) return "loading...."
 
   return (
     <>
